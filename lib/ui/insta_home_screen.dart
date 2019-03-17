@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:instagram_clone/blocs/profile_bloc_provider.dart';
 import 'package:instagram_clone/ui/insta_activity_screen.dart';
 import 'package:instagram_clone/ui/insta_add_screen.dart';
 import 'package:instagram_clone/ui/insta_feed_screen.dart';
@@ -60,7 +59,7 @@ class _InstaHomeScreenState extends State<InstaHomeScreen> {
                     color: Colors.white, child: InstaActivityScreen()),
                 new Container(
                     color: Colors.white,
-                    child: ProfileBlocProvider(child: InstaProfileScreen())),
+                    child: InstaProfileScreen()),
               ],
               controller: pageController,
               physics: new NeverScrollableScrollPhysics(),

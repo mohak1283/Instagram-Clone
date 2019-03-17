@@ -1,15 +1,24 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
-
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:instagram_clone/models/comment.dart';
+import 'package:instagram_clone/models/like.dart';
+import 'package:instagram_clone/models/post.dart';
 import 'package:instagram_clone/models/user.dart';
 
 class FirebaseProvider {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final Firestore _firestore = Firestore.instance;
-   User user;
-   final GoogleSignIn _googleSignIn = GoogleSignIn();
+  User user;
+  Post post;
+  Like like;
+  Comment comment;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  StorageReference _storageReference;
 
   Future<void> addDataToDb(FirebaseUser currentUser) async {
     print("Inside addDataToDb Method");
@@ -19,7 +28,7 @@ class FirebaseProvider {
         .document(currentUser.displayName)
         .setData({'displayName': currentUser.displayName});
 
-      user = User(
+    user = User(
         uid: currentUser.uid,
         email: currentUser.email,
         displayName: currentUser.displayName,
@@ -27,47 +36,16 @@ class FirebaseProvider {
         followers: '0',
         following: '0',
         bio: '',
-        posts: '0'
-      );
+        posts: '0');
 
-      Map<String, String> mapdata = Map<String, String>();
+    Map<String, String> mapdata = Map<String, String>();
 
-      mapdata = user.toMap(user);
-        
+    mapdata = user.toMap(user);
 
-    return _firestore.collection("users").document(currentUser.uid).setData(mapdata);
-  }
-
-  // Future<void> signIn(String email, String password) async {
-  //   FirebaseUser user = await _auth.signInWithEmailAndPassword(
-  //       email: email, password: password);
-  //   return user;
-  // }
-
-  Future<bool> checkIfUsernameExists(String username) async {
-    final DocumentReference _documentReference =
-        _firestore.collection("username").document(username);
-
-    DocumentSnapshot _documentSnapshot = await _documentReference.get();
-
-    if (_documentSnapshot.exists) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  Future<bool> checkIfUserExists(String uid) async {
-    final DocumentReference _documentReference =
-        _firestore.collection("users").document(uid);
-
-    DocumentSnapshot _documentSnapshot = await _documentReference.get();
-
-    if (_documentSnapshot.exists) {
-      return true;
-    } else {
-      return false;
-    }
+    return _firestore
+        .collection("users")
+        .document(currentUser.uid)
+        .setData(mapdata);
   }
 
   Future<bool> authenticateUser(FirebaseUser user) async {
@@ -79,25 +57,7 @@ class FirebaseProvider {
 
     final List<DocumentSnapshot> docs = result.documents;
 
-    if (docs.length == 0 ) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  Future<bool> authenticateUserName(String userName) async {
-   final QuerySnapshot userNameResult = await _firestore
-        .collection("usernames")
-        .where("username", isEqualTo: userName)
-        .getDocuments();
-
-    
-
-     final List<DocumentSnapshot> userNameDocs = userNameResult.documents;
-    
-
-    if (userNameDocs.length == 0 ) {
+    if (docs.length == 0) {
       return true;
     } else {
       return false;
@@ -117,8 +77,7 @@ class FirebaseProvider {
     return await _auth.signOut();
   }
 
-
-   Future<FirebaseUser> signIn() async {
+  Future<FirebaseUser> signIn() async {
     GoogleSignInAccount _signInAccount = await _googleSignIn.signIn();
     GoogleSignInAuthentication _signInAuthentication =
         await _signInAccount.authentication;
@@ -132,8 +91,37 @@ class FirebaseProvider {
     return user;
   }
 
+  Future<String> uploadImageToStorage(File imageFile) async {
+    _storageReference = FirebaseStorage.instance
+        .ref()
+        .child('${DateTime.now().millisecondsSinceEpoch}');
+    StorageUploadTask storageUploadTask = _storageReference.putFile(imageFile);
+    var url = await (await storageUploadTask.onComplete).ref.getDownloadURL();
+    return url;
+  }
 
+  Future<void> addPostToDb(FirebaseUser currentUser, String imgUrl,
+      String caption, String location) {
+    CollectionReference _collectionRef = _firestore
+        .collection("users")
+        .document(currentUser.uid)
+        .collection("posts");
 
+    post = Post(
+        currentUserUid: currentUser.uid,
+        imgUrl: imgUrl,
+        caption: caption,
+        location: location,
+        postOwnerName: currentUser.displayName,
+        postOwnerPhotoUrl: currentUser.photoUrl,
+        time: FieldValue.serverTimestamp());
 
+    comment = Comment();
+    like = Like();
 
+    return _collectionRef.add(post.toMap(post)).then((documentReference) {
+      documentReference.collection("comments").add(comment.toMap(comment));
+      documentReference.collection("likes").add(like.toMap(like));
+    });
+  }
 }

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:instagram_clone/blocs/login_bloc_provider.dart';
-import 'package:instagram_clone/blocs/profile_bloc.dart';
-import 'package:instagram_clone/blocs/profile_bloc_provider.dart';
 import 'package:instagram_clone/main.dart';
+import 'package:instagram_clone/resources/repository.dart';
 import 'package:instagram_clone/ui/login_screen.dart';
 
 class InstaProfileScreen extends StatefulWidget {
@@ -11,13 +9,8 @@ class InstaProfileScreen extends StatefulWidget {
 }
 
 class _InstaProfileScreenState extends State<InstaProfileScreen> {
-  ProfileBloc bloc;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    bloc = ProfileBlocProvider.of(context).bloc;
-  }
+  
+  var _repository = Repository();
 
   @override
   Widget build(BuildContext context) {
@@ -32,9 +25,9 @@ class _InstaProfileScreenState extends State<InstaProfileScreen> {
           textColor: Colors.white,
           child: Text('Log Out'),
           onPressed: () {
-            bloc.signOut().then((v) {
+            _repository.signOut().then((v) {
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-                return LoginBlocProvider(child: MyApp());
+                return MyApp();
               }));
             });
           },

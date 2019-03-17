@@ -1,11 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:instagram_clone/blocs/login_bloc.dart';
-import 'package:instagram_clone/blocs/login_bloc_provider.dart';
+import 'package:instagram_clone/resources/repository.dart';
 import 'package:instagram_clone/ui/insta_home_screen.dart';
 import 'package:instagram_clone/ui/login_screen.dart';
 
-void main() => runApp(LoginBlocProvider(child: MyApp()));
+void main() => runApp(MyApp());
 
 class MyApp extends StatefulWidget {
   @override
@@ -15,19 +14,7 @@ class MyApp extends StatefulWidget {
 }
 
 class MyAppState extends State<MyApp> {
-  LoginBloc bloc;
-
-  @override
-  void dispose() {
-    bloc?.dispose();
-    super.dispose();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    bloc = LoginBlocProvider.of(context).bloc;
-  }
+  var _repository = Repository();
 
   @override
   Widget build(BuildContext context) {
@@ -42,17 +29,14 @@ class MyAppState extends State<MyApp> {
                 title: TextStyle(color: Colors.black, fontFamily: "Aveny")),
             textTheme: TextTheme(title: TextStyle(color: Colors.black))),
         home: FutureBuilder(
-          future: bloc.getCurrentUser(),
+          future: _repository.getCurrentUser(),
           builder: (context, AsyncSnapshot<FirebaseUser> snapshot) {
             if (snapshot.hasData) {
               return InstaHomeScreen();
             } else {
-              return LoginBlocProvider(
-                child: LoginScreen(),
-              );
+              return LoginScreen();
             }
           },
-        )
-        );
+        ));
   }
 }

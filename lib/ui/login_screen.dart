@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:instagram_clone/blocs/login_bloc.dart';
-import 'package:instagram_clone/blocs/login_bloc_provider.dart';
+import 'package:instagram_clone/resources/repository.dart';
 import 'package:instagram_clone/ui/insta_home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -10,19 +9,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  LoginBloc bloc;
-
-  @override
-  void didChangeDependencies() {
-    bloc = LoginBlocProvider.of(context).bloc;
-    super.didChangeDependencies();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    bloc?.dispose();
-  }
+  var _repository = Repository();
 
   @override
   Widget build(BuildContext context) {
@@ -53,62 +40,26 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
           onTap: () {
-            bloc.signInWithGoogle().then((user) {
+            _repository.signIn().then((user) {
               if (user != null) {
                 authenticateUser(user);
               } else {
                 print("Error");
               }
             });
-            // FutureBuilder(
-            //     future: bloc.signInWithGoogle(),
-            //     builder: ((context, AsyncSnapshot<FirebaseUser> snapshot) {
-            //       if (snapshot.hasData) {
-            //         print("INSIDE IF");
-            //         print("Email : ${snapshot.data.email}");
-            //         authenticateUser(snapshot.data);
-            //       } else {
-            //         print("Error : ${snapshot.error}");
-            //       }
-            //     }));
           },
         ),
-        // child: RaisedButton(
-        //     color: Color(0xFF4285F4),
-        //     child: Row(
-        //       children: <Widget>[
-        //         Image.asset(
-        //           'assets/google_icon.jpg',
-        //           height: 48.0,
-        //         ),
-        //         new Expanded(
-        //           child: Text('Sign in with Google',
-        //               style: TextStyle(color: Colors.white)),
-        //         ),
-        //       ],
-        //     ),
-        //     onPressed: () {
-        //       FutureBuilder(
-        //           future: bloc.signInWithGoogle(),
-        //           builder: ((context, AsyncSnapshot<FirebaseUser> snapshot) {
-        //             if (snapshot.hasData) {
-        //                 authenticateUser(snapshot.data);
-        //             } else {
-        //               print("Error : ${snapshot.error}");
-        //             }
-        //           }));
-        //     }),
       ),
     );
   }
 
   void authenticateUser(FirebaseUser user) {
     print("Inside Login Screen -> authenticateUser");
-    bloc.authenticateUser(user).then((value) {
+    _repository.authenticateUser(user).then((value) {
       if (value) {
         print("VALUE : $value");
         print("INSIDE IF");
-        bloc.registerUser(user).then((value) {
+        _repository.addDataToDb(user).then((value) {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
             return InstaHomeScreen();
           }));

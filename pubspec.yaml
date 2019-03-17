@@ -24,6 +24,10 @@ dependencies:
   cloud_firestore:
   rxdart:
   image_picker:
+  file_picker:
+  firebase_storage:
+  location:
+  geocoder:
 
 dev_dependencies:
   flutter_test:
