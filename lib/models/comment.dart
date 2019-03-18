@@ -7,8 +7,9 @@ class Comment {
   String ownerPhotoUrl;
   String comment;
   FieldValue timeStamp;
+  String ownerUid;
 
-  Comment({this.ownerName, this.ownerPhotoUrl, this.comment, this.timeStamp});
+  Comment({this.ownerName, this.ownerPhotoUrl, this.comment, this.timeStamp, this.ownerUid});
 
    Map toMap(Comment comment) {
     var data = Map<String, dynamic>();
@@ -16,6 +17,7 @@ class Comment {
     data['ownerPhotoUrl'] = comment.ownerPhotoUrl;
     data['comment'] = comment.comment;
     data['timestamp'] = comment.timeStamp;
+    data['ownerUid'] = comment.ownerUid;
     return data;
 }
 
@@ -24,6 +26,7 @@ class Comment {
     this.ownerPhotoUrl = mapData['ownerPhotoUrl'];
     this.comment = mapData['comment'];
     this.timeStamp = mapData['timestamp'];
+    this.ownerUid = mapData['ownerUid'];
   }
 
 }

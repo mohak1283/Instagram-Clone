@@ -124,4 +124,19 @@ class FirebaseProvider {
       documentReference.collection("likes").add(like.toMap(like));
     });
   }
+
+  Future<User> retrieveUserDetails(FirebaseUser user) async {
+    DocumentSnapshot _documentSnapshot =
+        await _firestore.collection("users").document(user.uid).get();
+    return User.fromMap(_documentSnapshot.data);
+  }
+
+  Future<List<DocumentSnapshot>> retrieveUserPosts(String userId) async {
+    QuerySnapshot querySnapshot = await _firestore
+        .collection("users")
+        .document(userId)
+        .collection("posts")
+        .getDocuments();
+    return querySnapshot.documents;
+  }
 }
