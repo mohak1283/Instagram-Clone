@@ -120,8 +120,8 @@ class FirebaseProvider {
     like = Like();
 
     return _collectionRef.add(post.toMap(post)).then((documentReference) {
-      documentReference.collection("comments").add(comment.toMap(comment));
-      documentReference.collection("likes").add(like.toMap(like));
+      documentReference.collection("comments").document(currentUser.uid).setData(comment.toMap(comment));
+      documentReference.collection("likes").document(currentUser.uid).setData(like.toMap(like));
     });
   }
 
@@ -138,5 +138,24 @@ class FirebaseProvider {
         .collection("posts")
         .getDocuments();
     return querySnapshot.documents;
+  }
+
+  Future<List<DocumentSnapshot>> fetchPostCommentDetails(DocumentReference reference) async {
+
+    QuerySnapshot snapshot = await reference.collection("comments").getDocuments();
+    return snapshot.documents;
+  }
+
+  Future<List<DocumentSnapshot>> fetchPostLikeDetails(DocumentReference reference) async {
+
+    print("REFERENCE : ${reference.path}");
+    QuerySnapshot snapshot = await reference.collection("likes").getDocuments();
+    return snapshot.documents;
+  }
+
+  Future<bool> checkIfUserLikedOrNot(String userId, DocumentReference reference) async {
+    DocumentSnapshot snapshot = await reference.collection("likes").document(userId).get();
+    print('DOC ID : ${snapshot.reference.path}');
+    return snapshot.exists ? true : false;
   }
 }

@@ -28,6 +28,7 @@ dependencies:
   firebase_storage:
   location:
   geocoder:
+  font_awesome_flutter:
 
 dev_dependencies:
   flutter_test:
