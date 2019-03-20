@@ -158,4 +158,41 @@ class FirebaseProvider {
     print('DOC ID : ${snapshot.reference.path}');
     return snapshot.exists ? true : false;
   }
+
+  Future<List<DocumentSnapshot>>retrievePosts(FirebaseUser user) async {
+    List<DocumentSnapshot> list = List<DocumentSnapshot>();
+    List<DocumentSnapshot> updatedList = List<DocumentSnapshot>();
+    QuerySnapshot querySnapshot;
+    QuerySnapshot snapshot = await  _firestore.collection("users").getDocuments();
+    for(int i=0; i<snapshot.documents.length; i++) {
+      if (snapshot.documents[i].documentID != user.uid) {
+         list.add(snapshot.documents[i]);
+      } 
+    }
+    for (var i = 0; i < list.length; i++) {
+      querySnapshot = await list[i].reference.collection("posts").getDocuments();
+      for (var i = 0; i < querySnapshot.documents.length; i++) {
+        updatedList.add(querySnapshot.documents[i]);
+      }
+      
+    }
+   // fetchSearchPosts(updatedList);
+    print("UPDATED LIST LENGTH : ${updatedList.length}");
+    return updatedList;
+  }
+
+  Future<List<String>> fetchAllUserNames(FirebaseUser user) async {
+    List<String> userNameList = List<String>();
+    QuerySnapshot querySnapshot = await _firestore.collection("users").getDocuments();
+    for (var i = 0; i < querySnapshot.documents.length; i++) {
+      if(querySnapshot.documents[i].documentID != user.uid) {
+        userNameList.add(querySnapshot.documents[i].data['displayName']);
+      }
+    }
+    print("USERNAMES LIST : ${userNameList.length}");
+    return userNameList;
+  }
+
+  
+
 }

@@ -29,6 +29,8 @@ dependencies:
   location:
   geocoder:
   font_awesome_flutter:
+  shared_preferences:
+  cached_network_image: ^0.7.0
 
 dev_dependencies:
   flutter_test:
