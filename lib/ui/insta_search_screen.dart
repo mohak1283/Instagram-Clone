@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/models/user.dart';
 import 'package:instagram_clone/resources/repository.dart';
+import 'package:instagram_clone/ui/insta_friend_profile_screen.dart';
 import 'package:instagram_clone/ui/insta_profile_screen.dart';
 import 'package:instagram_clone/ui/post_detail_screen.dart';
 
@@ -134,8 +135,8 @@ class DataSearch extends SearchDelegate<String> {
 
   @override
   Widget buildResults(BuildContext context) {
-    
-   // return Center(child: Container(width: 50.0, height: 50.0, color: Colors.red,),);
+    return null;
+   // return Center(child: Container(width: 50.0, height: 50.0, color: Colors.red, child: Text(query),));
   }
 
   @override
@@ -147,10 +148,12 @@ class DataSearch extends SearchDelegate<String> {
       itemCount: suggestionsList.length,
       itemBuilder: ((context, index) => ListTile(
             onTap: () {
+              
+           //   showResults(context);
               Navigator.push(context, MaterialPageRoute(
-                builder: ((context) => InstaProfileScreen()) 
+                builder: ((context) => InstaFriendProfileScreen(name: suggestionsList[index])) 
               ));
-              //showResults(context);
+              
             },
             leading: Icon(Icons.account_circle),
             title: Text(suggestionsList[index]),

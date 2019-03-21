@@ -1,27 +1,28 @@
 import 'dart:async';
-import 'package:async/async.dart';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:instagram_clone/main.dart';
 import 'package:instagram_clone/models/like.dart';
 import 'package:instagram_clone/models/user.dart';
 import 'package:instagram_clone/resources/repository.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:instagram_clone/ui/comments_screen.dart';
 import 'package:instagram_clone/ui/likes_screen.dart';
 import 'package:instagram_clone/ui/post_detail_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
-class InstaProfileScreen extends StatefulWidget {
-  // InstaProfileScreen();
+class InstaFriendProfileScreen extends StatefulWidget {
+  final String name;
+  InstaFriendProfileScreen({this.name});
 
   @override
-  _InstaProfileScreenState createState() => _InstaProfileScreenState();
+  _InstaFriendProfileScreenState createState() =>
+      _InstaFriendProfileScreenState();
 }
 
-class _InstaProfileScreenState extends State<InstaProfileScreen> {
+class _InstaFriendProfileScreenState extends State<InstaFriendProfileScreen> {
+  String currentUserId, followingUserId;
   var _repository = Repository();
   Color _gridColor = Colors.blue;
   Color _listColor = Colors.grey;
@@ -31,22 +32,122 @@ class _InstaProfileScreenState extends State<InstaProfileScreen> {
   Color color;
   Future<List<DocumentSnapshot>> _future;
   bool _isLiked = false;
+  bool isFollowing = false;
+  bool followButtonClicked = false;
+  int postCount = 0;
+  int followerCount = 0;
+  int followingCount = 0;
+
+  fetchUidBySearchedName(String name) async {
+    String uid = await _repository.fetchUidBySearchedName(name);
+    setState(() {
+      followingUserId = uid;
+    });
+    fetchUserDetailsById(uid);
+    _future = _repository.retrieveUserPosts(uid);
+  }
+
+  fetchUserDetailsById(String userId) async {
+    User user = await _repository.fetchUserDetailsById(userId);
+    setState(() {
+      _user = user;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-    retrieveUserDetails();
-    icon = FontAwesomeIcons.heart;
-    // _future =_repository.retrieveUserPosts(_user.uid);
+    _repository.getCurrentUser().then((user) {
+      _repository.checkIsFollowing(widget.name, user.uid).then((value) {
+        print("VALUE : ${value}");
+        setState(() {
+          isFollowing = value;
+        });
+      });
+      setState(() {
+        currentUserId = user.uid;
+      });
+    });
+    fetchUidBySearchedName(widget.name);
+
+    // print("CURRENT USERIDDDD : ${currentUserId}");
+    // _repository.checkIsFollowing(widget.name, currentUserId).then((value) {
+    //   print("VALUE : ${value}");
+    //   setState(() {
+    //     isFollowing = value;
+    //   });
+    // });
   }
 
-  retrieveUserDetails() async {
-    FirebaseUser currentUser = await _repository.getCurrentUser();
-    User user = await _repository.retrieveUserDetails(currentUser);
+  followUser() {
+    print('following user');
+    _repository.followUser(
+        currentUserId: currentUserId, followingUserId: followingUserId);
     setState(() {
-      _user = user;
+      isFollowing = true;
+      followButtonClicked = true;
     });
-    _future = _repository.retrieveUserPosts(_user.uid);
+  }
+
+  unfollowUser() {
+    _repository.unFollowUser(
+        currentUserId: currentUserId, followingUserId: followingUserId);
+    setState(() {
+      isFollowing = false;
+      followButtonClicked = true;
+    });
+  }
+
+  Widget buildButton(
+      {String text,
+      Color backgroundcolor,
+      Color textColor,
+      Color borderColor,
+      Function function}) {
+    return GestureDetector(
+      onTap: function,
+      child: Container(
+        width: 230.0,
+        height: 30.0,
+        decoration: BoxDecoration(
+            color: backgroundcolor,
+            borderRadius: BorderRadius.circular(4.0),
+            border: Border.all(color: borderColor)),
+        child: Center(
+          child: Text(text, style: TextStyle(color: textColor)),
+        ),
+      ),
+    );
+  }
+
+  Widget buildProfileButton() {
+    // already following user - should show unfollow button
+    if (isFollowing) {
+      return buildButton(
+        text: "Unfollow",
+        backgroundcolor: Colors.white,
+        textColor: Colors.black,
+        borderColor: Colors.grey,
+        function: unfollowUser,
+      );
+    }
+
+    // does not follow user - should show follow button
+    if (!isFollowing) {
+      return buildButton(
+        text: "Follow",
+        backgroundcolor: Colors.blue,
+        textColor: Colors.white,
+        borderColor: Colors.blue,
+        function: followUser,
+      );
+    }
+
+    return buildButton(
+        text: "loading...",
+        backgroundcolor: Colors.white,
+        textColor: Colors.black,
+        borderColor: Colors.grey);
   }
 
   @override
@@ -99,11 +200,10 @@ class _InstaProfileScreenState extends State<InstaProfileScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: <Widget>[
-                               
-                                 StreamBuilder(
+                                StreamBuilder(
                                   stream: _repository
                                       .fetchStats(
-                                          uid: _user.uid, label: 'posts')
+                                          uid: followingUserId, label: 'posts')
                                       .asStream(),
                                   builder: ((context,
                                       AsyncSnapshot<List<DocumentSnapshot>>
@@ -113,9 +213,7 @@ class _InstaProfileScreenState extends State<InstaProfileScreen> {
                                           snapshot.data.length.toString(),
                                           'posts');
                                     } else {
-                                      return Center(
-                                        child: CircularProgressIndicator(),
-                                      );
+                                      return Center(child: CircularProgressIndicator(),);
                                     }
                                   }),
                                 ),
@@ -123,7 +221,7 @@ class _InstaProfileScreenState extends State<InstaProfileScreen> {
                                 StreamBuilder(
                                   stream: _repository
                                       .fetchStats(
-                                          uid: _user.uid,
+                                          uid: followingUserId,
                                           label: 'followers')
                                       .asStream(),
                                   builder: ((context,
@@ -138,9 +236,7 @@ class _InstaProfileScreenState extends State<InstaProfileScreen> {
                                             'followers'),
                                       );
                                     } else {
-                                      return Center(
-                                        child: CircularProgressIndicator(),
-                                      );
+                                      return Center(child: CircularProgressIndicator(),);
                                     }
                                   }),
                                 ),
@@ -148,7 +244,7 @@ class _InstaProfileScreenState extends State<InstaProfileScreen> {
                                 StreamBuilder(
                                   stream: _repository
                                       .fetchStats(
-                                          uid: _user.uid,
+                                          uid: followingUserId,
                                           label: 'following')
                                       .asStream(),
                                   builder: ((context,
@@ -163,30 +259,31 @@ class _InstaProfileScreenState extends State<InstaProfileScreen> {
                                             'following'),
                                       );
                                     } else {
-                                      return Center(
-                                        child: CircularProgressIndicator(),
-                                      );
+                                      return Center(child: CircularProgressIndicator(),);
                                     }
                                   }),
                                 ),
 
+                                //   detailsWidget(_user.posts, 'posts'),
                               ],
                             ),
                             Padding(
                               padding: const EdgeInsets.only(
                                   top: 12.0, left: 20.0, right: 20.0),
-                              child: Container(
-                                width: 230.0,
-                                height: 30.0,
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(4.0),
-                                    border: Border.all(color: Colors.grey)),
-                                child: Center(
-                                  child: Text('Edit Profile',
-                                      style: TextStyle(color: Colors.black)),
-                                ),
-                              ),
+                              child: buildProfileButton(),
+                              // child: Container(
+                              //   width: 230.0,
+                              //   height: 30.0,
+                              //   decoration: BoxDecoration(
+                              //     color: Colors.blue,
+                              //     borderRadius: BorderRadius.circular(4.0),
+                              //     // border: Border.all(color: Colors.grey)
+                              //   ),
+                              //   child: Center(
+                              //     child: Text('Follow',
+                              //         style: TextStyle(color: Colors.white)),
+                              //   ),
+                              // ),
                             )
                           ],
                         ),
@@ -203,10 +300,7 @@ class _InstaProfileScreenState extends State<InstaProfileScreen> {
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 25.0, top: 10.0),
-                    child: _user.bio.isNotEmpty
-                        ? Text(
-                            _user.bio)
-                        : Container(),
+                    child: _user.bio.isNotEmpty ? Text(_user.bio) : Container(),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 12.0),
@@ -288,19 +382,20 @@ class _InstaProfileScreenState extends State<InstaProfileScreen> {
                           fit: BoxFit.cover,
                         ),
                         onTap: () {
-                          print("SNAPSHOT : ${snapshot.data[index].reference.path}");
-                          Navigator.push(context, MaterialPageRoute(
-                            builder: ((context) => PostDetailScreen(
-                              user:_user,
-                              documentSnapshot:snapshot.data[index],
-                            )) 
-                          ));
+                          print(
+                              "SNAPSHOT : ${snapshot.data[index].reference.path}");
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: ((context) => PostDetailScreen(
+                                        user: _user,
+                                        documentSnapshot: snapshot.data[index],
+                                      ))));
                         },
                       );
                     }),
                   );
-                } 
-                else if (snapshot.hasError) {
+                } else if (snapshot.hasError) {
                   return Center(
                     child: Text('No Posts Found'),
                   );
@@ -338,7 +433,6 @@ class _InstaProfileScreenState extends State<InstaProfileScreen> {
             }),
           );
   }
-
 
   Widget detailsWidget(String count, String label) {
     return Column(
@@ -504,7 +598,6 @@ class _ListItemState extends State<ListItem> {
           height: 250.0,
           fit: BoxFit.cover,
         ),
-        
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Row(
@@ -586,7 +679,6 @@ class _ListItemState extends State<ListItem> {
             ],
           ),
         ),
-
         FutureBuilder(
           future:
               _repository.fetchPostLikes(widget.list[widget.index].reference),
@@ -621,7 +713,6 @@ class _ListItemState extends State<ListItem> {
             }
           }),
         ),
-
         Padding(
             padding:
                 const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -647,7 +738,6 @@ class _ListItemState extends State<ListItem> {
                     ],
                   )
                 : commentWidget(widget.list[widget.index].reference)),
-
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: Text("1 Day Ago", style: TextStyle(color: Colors.grey)),
