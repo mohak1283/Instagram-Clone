@@ -36,7 +36,8 @@ class FirebaseProvider {
         followers: '0',
         following: '0',
         bio: '',
-        posts: '0');
+        posts: '0',
+        phone: '');
 
     //  Map<String, String> mapdata = Map<String, dynamic>();
 
@@ -100,7 +101,7 @@ class FirebaseProvider {
     return url;
   }
 
-  Future<void> addPostToDb(FirebaseUser currentUser, String imgUrl,
+  Future<void> addPostToDb(User currentUser, String imgUrl,
       String caption, String location) {
     CollectionReference _collectionRef = _firestore
         .collection("users")
@@ -116,19 +117,7 @@ class FirebaseProvider {
         postOwnerPhotoUrl: currentUser.photoUrl,
         time: FieldValue.serverTimestamp());
 
-    comment = Comment();
-    like = Like();
-
-    return _collectionRef.add(post.toMap(post)).then((documentReference) {
-      documentReference
-          .collection("comments")
-          .document(currentUser.uid)
-          .setData(comment.toMap(comment));
-      documentReference
-          .collection("likes")
-          .document(currentUser.uid)
-          .setData(like.toMap(like));
-    });
+    return _collectionRef.add(post.toMap(post));
   }
 
   Future<User> retrieveUserDetails(FirebaseUser user) async {
@@ -297,6 +286,68 @@ class FirebaseProvider {
               .collection(label)
               .getDocuments();
     return querySnapshot.documents;          
+  }
+
+  Future<void> updatePhoto(String photoUrl, String uid) async {
+
+    Map<String, dynamic> map = Map();
+    map['photoUrl'] = photoUrl;
+    return _firestore.collection("users").document(uid).updateData(map);
+  }
+
+  Future<void> updateDetails(String uid, String name, String bio, String email, String phone) async {
+    Map<String, dynamic> map = Map();
+    map['displayName'] = name;
+    map['bio'] = bio;
+    map['email'] = email;
+    map['phone'] = phone;
+    return _firestore.collection("users").document(uid).updateData(map);
+  }
+
+   Future<List<String>> fetchUserNames(FirebaseUser user) async {
+    DocumentReference documentReference =  _firestore.collection("messages").document(user.uid);
+    List<String> userNameList = List<String>();
+    List<String> chatUsersList = List<String>();
+    QuerySnapshot querySnapshot =
+        await _firestore.collection("users").getDocuments();
+    for (var i = 0; i < querySnapshot.documents.length; i++) {
+      if (querySnapshot.documents[i].documentID != user.uid) {
+        print("USERNAMES : ${querySnapshot.documents[i].documentID}");
+        userNameList.add(querySnapshot.documents[i].documentID);      
+        //querySnapshot.documents[i].reference.collection("collectionPath");
+        //userNameList.add(querySnapshot.documents[i].data['displayName']);
+      }
+    }
+
+    for (var i = 0; i < userNameList.length; i++) {
+      if (documentReference.collection(userNameList[i]) != null) {
+         if(documentReference.collection(userNameList[i]).getDocuments()!=null){
+           print("CHAT USERS : ${userNameList[i]}");
+           chatUsersList.add(userNameList[i]);
+      }
+      }
+    }
+
+    print("CHAT USERS LIST : ${chatUsersList.length}");
+
+  return chatUsersList;
+
+    // print("USERNAMES LIST : ${userNameList.length}");
+    // return userNameList;
+  }
+
+  Future<List<User>> fetchAllUsers(FirebaseUser user) async {
+    List<User> userList = List<User>();
+    QuerySnapshot querySnapshot =
+        await _firestore.collection("users").getDocuments();
+    for (var i = 0; i < querySnapshot.documents.length; i++) {
+      if (querySnapshot.documents[i].documentID != user.uid) {
+        userList.add(User.fromMap(querySnapshot.documents[i].data));
+        //userList.add(querySnapshot.documents[i].data[User.fromMap(mapData)]);
+      }
+    }
+    print("USERSLIST : ${userList.length}");
+    return userList;
   }
 
 }

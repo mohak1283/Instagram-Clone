@@ -9,8 +9,9 @@ class User {
    String following;
    String posts;
    String bio;
+   String phone;
 
-   User({this.uid, this.email, this.photoUrl, this.displayName, this.followers, this.following, this.bio, this.posts});
+   User({this.uid, this.email, this.photoUrl, this.displayName, this.followers, this.following, this.bio, this.posts, this.phone});
 
     Map toMap(User user) {
     var data = Map<String, dynamic>();
@@ -22,6 +23,7 @@ class User {
     data['following'] = user.following;
     data['bio'] = user.bio;
     data['posts'] = user.posts;
+    data['phone'] = user.phone;
     return data;
   }
 
@@ -34,6 +36,7 @@ class User {
     this.following = mapData['following'];
     this.bio = mapData['bio'];
     this.posts = mapData['posts'];
+    this.phone = mapData['phone']; 
   }
 }
 

@@ -9,6 +9,7 @@ import 'package:instagram_clone/models/user.dart';
 import 'package:instagram_clone/resources/repository.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:instagram_clone/ui/comments_screen.dart';
+import 'package:instagram_clone/ui/edit_profile_screen.dart';
 import 'package:instagram_clone/ui/likes_screen.dart';
 import 'package:instagram_clone/ui/post_detail_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -99,8 +100,7 @@ class _InstaProfileScreenState extends State<InstaProfileScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: <Widget>[
-                               
-                                 StreamBuilder(
+                                StreamBuilder(
                                   stream: _repository
                                       .fetchStats(
                                           uid: _user.uid, label: 'posts')
@@ -119,12 +119,10 @@ class _InstaProfileScreenState extends State<InstaProfileScreen> {
                                     }
                                   }),
                                 ),
-
                                 StreamBuilder(
                                   stream: _repository
                                       .fetchStats(
-                                          uid: _user.uid,
-                                          label: 'followers')
+                                          uid: _user.uid, label: 'followers')
                                       .asStream(),
                                   builder: ((context,
                                       AsyncSnapshot<List<DocumentSnapshot>>
@@ -144,12 +142,10 @@ class _InstaProfileScreenState extends State<InstaProfileScreen> {
                                     }
                                   }),
                                 ),
-
                                 StreamBuilder(
                                   stream: _repository
                                       .fetchStats(
-                                          uid: _user.uid,
-                                          label: 'following')
+                                          uid: _user.uid, label: 'following')
                                       .asStream(),
                                   builder: ((context,
                                       AsyncSnapshot<List<DocumentSnapshot>>
@@ -169,24 +165,36 @@ class _InstaProfileScreenState extends State<InstaProfileScreen> {
                                     }
                                   }),
                                 ),
-
                               ],
                             ),
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 12.0, left: 20.0, right: 20.0),
-                              child: Container(
-                                width: 230.0,
-                                height: 30.0,
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(4.0),
-                                    border: Border.all(color: Colors.grey)),
-                                child: Center(
-                                  child: Text('Edit Profile',
-                                      style: TextStyle(color: Colors.black)),
+                            GestureDetector(
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 12.0, left: 20.0, right: 20.0),
+                                child: Container(
+                                  width: 230.0,
+                                  height: 30.0,
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(4.0),
+                                      border: Border.all(color: Colors.grey)),
+                                  child: Center(
+                                    child: Text('Edit Profile',
+                                        style: TextStyle(color: Colors.black)),
+                                  ),
                                 ),
                               ),
+                              onTap: () {
+                                Navigator.push(context, MaterialPageRoute(
+                                  builder: ((context) => EditProfileScreen(
+                                    photoUrl: _user.photoUrl,
+                                    email: _user.email,
+                                    bio: _user.bio,
+                                    name: _user.displayName,
+                                    phone: _user.phone
+                                  ))
+                                ));
+                              },
                             )
                           ],
                         ),
@@ -203,10 +211,7 @@ class _InstaProfileScreenState extends State<InstaProfileScreen> {
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 25.0, top: 10.0),
-                    child: _user.bio.isNotEmpty
-                        ? Text(
-                            _user.bio)
-                        : Container(),
+                    child: _user.bio.isNotEmpty ? Text(_user.bio) : Container(),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 12.0),
@@ -288,19 +293,20 @@ class _InstaProfileScreenState extends State<InstaProfileScreen> {
                           fit: BoxFit.cover,
                         ),
                         onTap: () {
-                          print("SNAPSHOT : ${snapshot.data[index].reference.path}");
-                          Navigator.push(context, MaterialPageRoute(
-                            builder: ((context) => PostDetailScreen(
-                              user:_user,
-                              documentSnapshot:snapshot.data[index],
-                            )) 
-                          ));
+                          print(
+                              "SNAPSHOT : ${snapshot.data[index].reference.path}");
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: ((context) => PostDetailScreen(
+                                        user: _user,
+                                        documentSnapshot: snapshot.data[index],
+                                      ))));
                         },
                       );
                     }),
                   );
-                } 
-                else if (snapshot.hasError) {
+                } else if (snapshot.hasError) {
                   return Center(
                     child: Text('No Posts Found'),
                   );
@@ -338,7 +344,6 @@ class _InstaProfileScreenState extends State<InstaProfileScreen> {
             }),
           );
   }
-
 
   Widget detailsWidget(String count, String label) {
     return Column(
@@ -504,7 +509,6 @@ class _ListItemState extends State<ListItem> {
           height: 250.0,
           fit: BoxFit.cover,
         ),
-        
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Row(
@@ -586,7 +590,6 @@ class _ListItemState extends State<ListItem> {
             ],
           ),
         ),
-
         FutureBuilder(
           future:
               _repository.fetchPostLikes(widget.list[widget.index].reference),
@@ -621,7 +624,6 @@ class _ListItemState extends State<ListItem> {
             }
           }),
         ),
-
         Padding(
             padding:
                 const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -647,7 +649,6 @@ class _ListItemState extends State<ListItem> {
                     ],
                   )
                 : commentWidget(widget.list[widget.index].reference)),
-
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: Text("1 Day Ago", style: TextStyle(color: Colors.grey)),

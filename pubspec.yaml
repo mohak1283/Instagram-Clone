@@ -31,6 +31,7 @@ dependencies:
   font_awesome_flutter:
   shared_preferences:
   cached_network_image: ^0.7.0
+  image:
 
 dev_dependencies:
   flutter_test:

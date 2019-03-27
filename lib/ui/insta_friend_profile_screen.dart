@@ -51,6 +51,7 @@ class _InstaFriendProfileScreenState extends State<InstaFriendProfileScreen> {
     User user = await _repository.fetchUserDetailsById(userId);
     setState(() {
       _user = user;
+      print("USER : ${_user.displayName}");
     });
   }
 
@@ -158,20 +159,6 @@ class _InstaFriendProfileScreenState extends State<InstaFriendProfileScreen> {
           backgroundColor: new Color(0xfff8faf8),
           elevation: 1,
           title: Text('Profile'),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.settings_power),
-              color: Colors.black,
-              onPressed: () {
-                _repository.signOut().then((v) {
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) {
-                    return MyApp();
-                  }));
-                });
-              },
-            )
-          ],
         ),
         body: _user != null
             ? ListView(

@@ -19,7 +19,7 @@ class _InstaSearchScreenState extends State<InstaSearchScreen> {
   var _repository = Repository();
   List<DocumentSnapshot> list = List<DocumentSnapshot>();
   User _user = User();
-  List<String> userNameList = List<String>();
+  List<User> usersList = List<User>();
 
   @override
   void initState() {
@@ -34,9 +34,9 @@ class _InstaSearchScreenState extends State<InstaSearchScreen> {
           list = updatedList;
         });
       });
-      _repository.fetchAllUserNames(user).then((list) {
+      _repository.fetchAllUsers(user).then((list) {
         setState(() {
-          userNameList = list;
+          usersList = list;
         });
       });
     });
@@ -54,7 +54,7 @@ class _InstaSearchScreenState extends State<InstaSearchScreen> {
           IconButton(
             icon: Icon(Icons.search),
             onPressed: () {
-              showSearch(context: context, delegate: DataSearch(userNameList: userNameList));
+              showSearch(context: context, delegate: DataSearch(userList: usersList));
             },
           )
         ],
@@ -94,19 +94,8 @@ class _InstaSearchScreenState extends State<InstaSearchScreen> {
 
 class DataSearch extends SearchDelegate<String> {
 
-   List<String> userNameList;
-   DataSearch({this.userNameList});
-
-  final cities = [
-    'New Delhi',
-    'Faridabad',
-    'Ghaziabad',
-    'Janakpuri',
-    'Paschim Vihar',
-    'Pitampura'
-  ];
-
-  final recentCities = ['New Delhi', 'Pitampura'];
+   List<User> userList;
+   DataSearch({this.userList});
 
   @override
   List<Widget> buildActions(BuildContext context) {
@@ -142,8 +131,8 @@ class DataSearch extends SearchDelegate<String> {
   @override
   Widget buildSuggestions(BuildContext context) {
     final suggestionsList = query.isEmpty
-        ? recentCities
-        : userNameList.where((p) => p.startsWith(query)).toList();
+        ? userList
+        : userList.where((p) => p.displayName.startsWith(query)).toList();
     return ListView.builder(
       itemCount: suggestionsList.length,
       itemBuilder: ((context, index) => ListTile(
@@ -151,12 +140,14 @@ class DataSearch extends SearchDelegate<String> {
               
            //   showResults(context);
               Navigator.push(context, MaterialPageRoute(
-                builder: ((context) => InstaFriendProfileScreen(name: suggestionsList[index])) 
+                builder: ((context) => InstaFriendProfileScreen(name: suggestionsList[index].displayName)) 
               ));
               
             },
-            leading: Icon(Icons.account_circle),
-            title: Text(suggestionsList[index]),
+            leading: CircleAvatar(
+              backgroundImage: NetworkImage(suggestionsList[index].photoUrl),
+            ),
+            title: Text(suggestionsList[index].displayName),
           )),
     );
   }

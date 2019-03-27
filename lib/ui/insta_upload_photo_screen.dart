@@ -6,9 +6,12 @@ import 'package:instagram_clone/ui/insta_home_screen.dart';
 import 'package:location/location.dart';
 import 'package:flutter/services.dart';
 import 'package:geocoder/geocoder.dart';
+import 'package:image/image.dart' as Im;
+import 'package:path_provider/path_provider.dart';
+import 'dart:math';
 
 class InstaUploadPhotoScreen extends StatefulWidget {
-  final File imageFile;
+   File imageFile;
   InstaUploadPhotoScreen({this.imageFile});
 
   @override
@@ -55,11 +58,13 @@ class _InstaUploadPhotoScreenState extends State<InstaUploadPhotoScreen> {
 
                 _repository.getCurrentUser().then((currentUser) {
                   if (currentUser != null) {
-                    _repository
+                    compressImage();
+                    _repository.retrieveUserDetails(currentUser).then((user) {
+                      _repository
                         .uploadImageToStorage(widget.imageFile)
                         .then((url) {
                       _repository
-                          .addPostToDb(currentUser, url,
+                          .addPostToDb(user, url,
                               _captionController.text, _locationController.text)
                           .then((value) {
                         print("Post added to db");
@@ -71,6 +76,8 @@ class _InstaUploadPhotoScreenState extends State<InstaUploadPhotoScreen> {
                     }).catchError((e) {
                       print("Error uploading image to storage : $e");
                     });
+                    });
+                    
                   } else {
                     print("Current User is null");
                   }
@@ -183,6 +190,27 @@ class _InstaUploadPhotoScreenState extends State<InstaUploadPhotoScreen> {
         ],
       ),
     );
+  }
+
+  void compressImage() async {
+    print('starting compression');
+    final tempDir = await getTemporaryDirectory();
+    final path = tempDir.path;
+    int rand = Random().nextInt(10000);
+
+    Im.Image image = Im.decodeImage(widget.imageFile.readAsBytesSync());
+    Im.copyResize(image, 500);
+
+//    image.format = Im.Image.RGBA;
+//    Im.Image newim = Im.remapColors(image, alpha: Im.LUMINANCE);
+
+    var newim2 = new File('$path/img_$rand.jpg')
+      ..writeAsBytesSync(Im.encodeJpg(image, quality: 85));
+
+    setState(() {
+      widget.imageFile = newim2;
+    });
+    print('done');
   }
 
   Future<List<Address>> locateUser() async {
