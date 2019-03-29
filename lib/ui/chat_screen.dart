@@ -11,7 +11,6 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   var _repository = Repository();
-  //List<DocumentSnapshot> list = List<DocumentSnapshot>();
   User _user = User();
   List<User> usersList = List<User>();
 
@@ -21,11 +20,6 @@ class _ChatScreenState extends State<ChatScreen> {
     _repository.getCurrentUser().then((user) {
       print("USER : ${user.displayName}");
 
-      // _repository.fetchAllUserNames(user).then((list) {
-      //   setState(() {
-      //     userNameList = list;
-      //   });
-      // });
       _repository.fetchAllUsers(user).then((updatedList) {
         setState(() {
           usersList = updatedList;
@@ -92,9 +86,7 @@ class ChatSearch extends SearchDelegate<String> {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    // final suggestionsList = query.isEmpty
-    //     ? recentCities
-    //     : userNameList.where((p) => p.startsWith(query)).toList();
+   
     final List<User> suggestionsList = query.isEmpty
         ? usersList
         : usersList.where((p) => p.displayName.startsWith(query)).toList();
