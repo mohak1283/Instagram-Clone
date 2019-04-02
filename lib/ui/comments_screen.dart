@@ -106,7 +106,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
         ownerUid: widget.user.uid);
     widget.documentReference
         .collection("comments")
-        .document(widget.user.uid)
+        .document()
         .setData(_comment.toMap(_comment)).whenComplete(() {
           _commentController.text = "";
         });
