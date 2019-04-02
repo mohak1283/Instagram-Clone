@@ -39,6 +39,7 @@ class _InstaFriendProfileScreenState extends State<InstaFriendProfileScreen> {
   int followingCount = 0;
 
   fetchUidBySearchedName(String name) async {
+    print("NAME : ${name}");
     String uid = await _repository.fetchUidBySearchedName(name);
     setState(() {
       followingUserId = uid;
@@ -70,14 +71,6 @@ class _InstaFriendProfileScreenState extends State<InstaFriendProfileScreen> {
       });
     });
     fetchUidBySearchedName(widget.name);
-
-    // print("CURRENT USERIDDDD : ${currentUserId}");
-    // _repository.checkIsFollowing(widget.name, currentUserId).then((value) {
-    //   print("VALUE : ${value}");
-    //   setState(() {
-    //     isFollowing = value;
-    //   });
-    // });
   }
 
   followUser() {
@@ -258,19 +251,6 @@ class _InstaFriendProfileScreenState extends State<InstaFriendProfileScreen> {
                               padding: const EdgeInsets.only(
                                   top: 12.0, left: 20.0, right: 20.0),
                               child: buildProfileButton(),
-                              // child: Container(
-                              //   width: 230.0,
-                              //   height: 30.0,
-                              //   decoration: BoxDecoration(
-                              //     color: Colors.blue,
-                              //     borderRadius: BorderRadius.circular(4.0),
-                              //     // border: Border.all(color: Colors.grey)
-                              //   ),
-                              //   child: Center(
-                              //     child: Text('Follow',
-                              //         style: TextStyle(color: Colors.white)),
-                              //   ),
-                              // ),
                             )
                           ],
                         ),
@@ -455,17 +435,6 @@ class _ListItemState extends State<ListItem> {
   bool _isLiked = false;
   Future<List<DocumentSnapshot>> _future;
 
-  //  bool checkStatus(DocumentReference reference) {
-  //    bool _isLiked = false;
-  //    _repository.checkIfUserLikedOrNot(widget.user.uid, reference).then((status) {
-  //      setState(() {
-  //        print("status : $status");
-  //        _isLiked = status;
-  //      });
-  //   });
-  //   return _isLiked;
-  // }
-
   Widget commentWidget(DocumentReference reference) {
     return FutureBuilder(
       future: _repository.fetchPostComments(reference),
@@ -493,36 +462,10 @@ class _ListItemState extends State<ListItem> {
     );
   }
 
-  // Future<bool> saveLikeValue(bool value) async {
-  //   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   return prefs.setBool('isLiked', value);
-  // }
-
-  // Future<bool> getLikeValue() async {
-  //   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   bool value = prefs.getBool('isLiked');
-  //   setState(() {
-  //     _isLiked =value;
-  //   });
-
-  // }
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   setState(() {
-  //     _isLiked = false;
-  //   });
-  //   // saveLikeValue(_isLiked).then((value) {
-  //   //   getLikeValue();
-  //   // });
-  // }
-
   @override
   void initState() {
     super.initState();
     print("INDEX : ${widget.index}");
-    //_future =_repository.fetchPostLikes(widget.list[widget.index].reference);
   }
 
   @override
@@ -608,35 +551,15 @@ class _ListItemState extends State<ListItem> {
                           setState(() {
                             _isLiked = true;
                           });
-                          // saveLikeValue(_isLiked);
+                          
                           postLike(widget.list[widget.index].reference);
                         } else {
                           setState(() {
                             _isLiked = false;
                           });
-                          //saveLikeValue(_isLiked);
+                         
                           postUnlike(widget.list[widget.index].reference);
                         }
-
-                        // _repository.checkIfUserLikedOrNot(_user.uid, snapshot.data[index].reference).then((isLiked) {
-                        //   print("reef : ${snapshot.data[index].reference.path}");
-                        //   if (!isLiked) {
-                        //     setState(() {
-                        //       icon = Icons.favorite;
-                        //       color = Colors.red;
-                        //     });
-                        //     postLike(snapshot.data[index].reference);
-                        //   } else {
-
-                        //     setState(() {
-                        //       icon =FontAwesomeIcons.heart;
-                        //       color = null;
-                        //     });
-                        //     postUnlike(snapshot.data[index].reference);
-                        //   }
-                        // });
-                        // updateValues(
-                        //     snapshot.data[index].reference);
                       }),
                   new SizedBox(
                     width: 16.0,

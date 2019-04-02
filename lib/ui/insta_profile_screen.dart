@@ -38,7 +38,6 @@ class _InstaProfileScreenState extends State<InstaProfileScreen> {
     super.initState();
     retrieveUserDetails();
     icon = FontAwesomeIcons.heart;
-    // _future =_repository.retrieveUserPosts(_user.uid);
   }
 
   retrieveUserDetails() async {
@@ -93,6 +92,7 @@ class _InstaProfileScreenState extends State<InstaProfileScreen> {
                                   fit: BoxFit.cover),
                             )),
                       ),
+                      
                       Padding(
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Column(
@@ -379,17 +379,6 @@ class _ListItemState extends State<ListItem> {
   bool _isLiked = false;
   Future<List<DocumentSnapshot>> _future;
 
-  //  bool checkStatus(DocumentReference reference) {
-  //    bool _isLiked = false;
-  //    _repository.checkIfUserLikedOrNot(widget.user.uid, reference).then((status) {
-  //      setState(() {
-  //        print("status : $status");
-  //        _isLiked = status;
-  //      });
-  //   });
-  //   return _isLiked;
-  // }
-
   Widget commentWidget(DocumentReference reference) {
     return FutureBuilder(
       future: _repository.fetchPostComments(reference),
@@ -416,31 +405,6 @@ class _ListItemState extends State<ListItem> {
       }),
     );
   }
-
-  // Future<bool> saveLikeValue(bool value) async {
-  //   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   return prefs.setBool('isLiked', value);
-  // }
-
-  // Future<bool> getLikeValue() async {
-  //   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   bool value = prefs.getBool('isLiked');
-  //   setState(() {
-  //     _isLiked =value;
-  //   });
-
-  // }
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   setState(() {
-  //     _isLiked = false;
-  //   });
-  //   // saveLikeValue(_isLiked).then((value) {
-  //   //   getLikeValue();
-  //   // });
-  // }
 
   @override
   void initState() {
@@ -541,26 +505,6 @@ class _ListItemState extends State<ListItem> {
                           //saveLikeValue(_isLiked);
                           postUnlike(widget.list[widget.index].reference);
                         }
-
-                        // _repository.checkIfUserLikedOrNot(_user.uid, snapshot.data[index].reference).then((isLiked) {
-                        //   print("reef : ${snapshot.data[index].reference.path}");
-                        //   if (!isLiked) {
-                        //     setState(() {
-                        //       icon = Icons.favorite;
-                        //       color = Colors.red;
-                        //     });
-                        //     postLike(snapshot.data[index].reference);
-                        //   } else {
-
-                        //     setState(() {
-                        //       icon =FontAwesomeIcons.heart;
-                        //       color = null;
-                        //     });
-                        //     postUnlike(snapshot.data[index].reference);
-                        //   }
-                        // });
-                        // updateValues(
-                        //     snapshot.data[index].reference);
                       }),
                   new SizedBox(
                     width: 16.0,

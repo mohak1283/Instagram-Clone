@@ -201,9 +201,6 @@ class _InstaUploadPhotoScreenState extends State<InstaUploadPhotoScreen> {
     Im.Image image = Im.decodeImage(widget.imageFile.readAsBytesSync());
     Im.copyResize(image, 500);
 
-//    image.format = Im.Image.RGBA;
-//    Im.Image newim = Im.remapColors(image, alpha: Im.LUMINANCE);
-
     var newim2 = new File('$path/img_$rand.jpg')
       ..writeAsBytesSync(Im.encodeJpg(image, quality: 85));
 

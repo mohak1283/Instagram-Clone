@@ -32,6 +32,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   @override
   void initState() {
     super.initState();
+    print("RCID : ${widget.receiverUid}");
     _repository.getCurrentUser().then((user) {
       setState(() {
         _senderuid = user.uid;

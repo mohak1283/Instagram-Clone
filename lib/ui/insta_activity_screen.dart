@@ -13,7 +13,9 @@ class _InstaActivityScreenState extends State<InstaActivityScreen> {
         backgroundColor: Colors.white,
         title: Text('Activity'),
       ),
-      body: Container(),
+      body: Center(
+        child: Text('NOT IMPLEMENTED YET'),
+      ),
     );
   }
 }

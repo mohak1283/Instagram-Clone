@@ -31,21 +31,46 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: Text('Search'),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () {
-              showSearch(
-                  context: context, delegate: ChatSearch(usersList: usersList));
-            },
-          )
-        ],
-      ),
-      body: Container(),
-    );
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          title: Text('Search'),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.search),
+              onPressed: () {
+                showSearch(
+                    context: context,
+                    delegate: ChatSearch(usersList: usersList));
+              },
+            )
+          ],
+        ),
+        body: ListView.builder(
+          itemCount: usersList.length,
+          itemBuilder: ((context, index) {
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: ((context) => ChatDetailScreen(
+                                photoUrl: usersList[index].photoUrl,
+                                name: usersList[index].displayName,
+                                receiverUid: usersList[index].uid,
+                              ))));
+                },
+                child: ListTile(
+                  leading: CircleAvatar(
+                    backgroundImage: NetworkImage(usersList[index].photoUrl),
+                  ),
+                  title: Text(usersList[index].displayName),
+                ),
+              ),
+            );
+          }),
+        ));
   }
 }
 
@@ -86,7 +111,6 @@ class ChatSearch extends SearchDelegate<String> {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-   
     final List<User> suggestionsList = query.isEmpty
         ? usersList
         : usersList.where((p) => p.displayName.startsWith(query)).toList();
