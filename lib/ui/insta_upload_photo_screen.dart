@@ -19,9 +19,17 @@ class InstaUploadPhotoScreen extends StatefulWidget {
 }
 
 class _InstaUploadPhotoScreenState extends State<InstaUploadPhotoScreen> {
-  var _locationController = TextEditingController();
-  var _captionController = TextEditingController();
+  var _locationController;
+  var _captionController;
   final _repository = Repository();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _locationController = TextEditingController();
+    _captionController = TextEditingController();
+  }
 
   @override
   void dispose() {
@@ -29,6 +37,8 @@ class _InstaUploadPhotoScreenState extends State<InstaUploadPhotoScreen> {
     _locationController?.dispose();
     _captionController?.dispose();
   }
+
+  
 
 
   bool _visibility = true;

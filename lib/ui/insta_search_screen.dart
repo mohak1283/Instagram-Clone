@@ -19,6 +19,7 @@ class _InstaSearchScreenState extends State<InstaSearchScreen> {
   var _repository = Repository();
   List<DocumentSnapshot> list = List<DocumentSnapshot>();
   User _user = User();
+  User currentUser;
   List<User> usersList = List<User>();
 
   @override
@@ -28,6 +29,11 @@ class _InstaSearchScreenState extends State<InstaSearchScreen> {
       _user.uid = user.uid;
       _user.displayName = user.displayName;
       _user.photoUrl = user.photoUrl;
+      _repository.fetchUserDetailsById(user.uid).then((user) {
+        setState(() {
+          currentUser = user;
+        });
+      });
       print("USER : ${user.displayName}");
       _repository.retrievePosts(user).then((updatedList) {
         setState(() {
@@ -83,6 +89,7 @@ class _InstaSearchScreenState extends State<InstaSearchScreen> {
                     MaterialPageRoute(
                         builder: ((context) => PostDetailScreen(
                               user: _user,
+                              currentuser: currentUser,
                               documentSnapshot: list[index],
                             ))));
               },

@@ -10,9 +10,9 @@ import 'package:instagram_clone/ui/likes_screen.dart';
 
 class PostDetailScreen extends StatefulWidget {
   final DocumentSnapshot documentSnapshot;
-  final User user;
+  final User user, currentuser;
 
-  PostDetailScreen({this.documentSnapshot, this.user});
+  PostDetailScreen({this.documentSnapshot, this.user, this.currentuser});
 
   @override
   _PostDetailScreenState createState() => _PostDetailScreenState();
@@ -135,7 +135,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                   builder: ((context) => CommentsScreen(
                                         documentReference:
                                             widget.documentSnapshot.reference,
-                                        user: widget.user,
+                                        user: widget.currentuser,
                                       ))));
                         },
                         child: new Icon(
@@ -166,7 +166,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                           context,
                           MaterialPageRoute(
                               builder: ((context) => LikesScreen(
-                                    user: widget.user,
+                                    user: widget.currentuser,
                                     documentReference:
                                         widget.documentSnapshot.reference,
                                   ))));
@@ -241,7 +241,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                   MaterialPageRoute(
                       builder: ((context) => CommentsScreen(
                             documentReference: reference,
-                            user: widget.user,
+                            user: widget.currentuser,
                           ))));
             },
           );
@@ -254,13 +254,13 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
   void postLike(DocumentReference reference) {
     var _like = Like(
-        ownerName: widget.user.displayName,
-        ownerPhotoUrl: widget.user.photoUrl,
-        ownerUid: widget.user.uid,
+        ownerName: widget.currentuser.displayName,
+        ownerPhotoUrl: widget.currentuser.photoUrl,
+        ownerUid: widget.currentuser.uid,
         timeStamp: FieldValue.serverTimestamp());
     reference
         .collection('likes')
-        .document(widget.user.uid)
+        .document(widget.currentuser.uid)
         .setData(_like.toMap(_like))
         .then((value) {
       print("Post Liked");
@@ -270,7 +270,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   void postUnlike(DocumentReference reference) {
     reference
         .collection("likes")
-        .document(widget.user.uid)
+        .document(widget.currentuser.uid)
         .delete()
         .then((value) {
       print("Post Unliked");

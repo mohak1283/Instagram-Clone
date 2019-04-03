@@ -172,7 +172,7 @@ class _InstaProfileScreenState extends State<InstaProfileScreen> {
                                 padding: const EdgeInsets.only(
                                     top: 12.0, left: 20.0, right: 20.0),
                                 child: Container(
-                                  width: 230.0,
+                                  width: 210.0,
                                   height: 30.0,
                                   decoration: BoxDecoration(
                                       color: Colors.white,
@@ -300,6 +300,7 @@ class _InstaProfileScreenState extends State<InstaProfileScreen> {
                               MaterialPageRoute(
                                   builder: ((context) => PostDetailScreen(
                                         user: _user,
+                                        currentuser: _user,
                                         documentSnapshot: snapshot.data[index],
                                       ))));
                         },

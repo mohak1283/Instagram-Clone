@@ -27,7 +27,7 @@ class _InstaFriendProfileScreenState extends State<InstaFriendProfileScreen> {
   Color _gridColor = Colors.blue;
   Color _listColor = Colors.grey;
   bool _isGridActive = true;
-  User _user;
+  User _user, currentuser;
   IconData icon;
   Color color;
   Future<List<DocumentSnapshot>> _future;
@@ -60,6 +60,11 @@ class _InstaFriendProfileScreenState extends State<InstaFriendProfileScreen> {
   void initState() {
     super.initState();
     _repository.getCurrentUser().then((user) {
+      _repository.fetchUserDetailsById(user.uid).then((currentUser) {
+        setState(() {
+          currentuser = currentUser;
+        });
+      });
       _repository.checkIsFollowing(widget.name, user.uid).then((value) {
         print("VALUE : ${value}");
         setState(() {
@@ -101,7 +106,7 @@ class _InstaFriendProfileScreenState extends State<InstaFriendProfileScreen> {
     return GestureDetector(
       onTap: function,
       child: Container(
-        width: 230.0,
+        width: 210.0,
         height: 30.0,
         decoration: BoxDecoration(
             color: backgroundcolor,
@@ -356,6 +361,7 @@ class _InstaFriendProfileScreenState extends State<InstaFriendProfileScreen> {
                               MaterialPageRoute(
                                   builder: ((context) => PostDetailScreen(
                                         user: _user,
+                                        currentuser: currentuser,
                                         documentSnapshot: snapshot.data[index],
                                       ))));
                         },
@@ -386,7 +392,8 @@ class _InstaFriendProfileScreenState extends State<InstaFriendProfileScreen> {
                           itemBuilder: ((context, index) => ListItem(
                               list: snapshot.data,
                               index: index,
-                              user: _user))));
+                              user: _user,
+                              currentuser: currentuser))));
                 } else {
                   return Center(
                     child: CircularProgressIndicator(),
@@ -421,10 +428,10 @@ class _InstaFriendProfileScreenState extends State<InstaFriendProfileScreen> {
 
 class ListItem extends StatefulWidget {
   List<DocumentSnapshot> list;
-  User user;
+  User user, currentuser;
   int index;
 
-  ListItem({this.list, this.user, this.index});
+  ListItem({this.list, this.user, this.index, this.currentuser});
 
   @override
   _ListItemState createState() => _ListItemState();
@@ -451,7 +458,7 @@ class _ListItemState extends State<ListItem> {
                   MaterialPageRoute(
                       builder: ((context) => CommentsScreen(
                             documentReference: reference,
-                            user: widget.user,
+                            user: widget.currentuser,
                           ))));
             },
           );
@@ -572,7 +579,7 @@ class _ListItemState extends State<ListItem> {
                               builder: ((context) => CommentsScreen(
                                     documentReference:
                                         widget.list[widget.index].reference,
-                                    user: widget.user,
+                                    user: widget.currentuser,
                                   ))));
                     },
                     child: new Icon(
@@ -658,13 +665,13 @@ class _ListItemState extends State<ListItem> {
 
   void postLike(DocumentReference reference) {
     var _like = Like(
-        ownerName: widget.user.displayName,
-        ownerPhotoUrl: widget.user.photoUrl,
-        ownerUid: widget.user.uid,
+        ownerName: widget.currentuser.displayName,
+        ownerPhotoUrl: widget.currentuser.photoUrl,
+        ownerUid: widget.currentuser.uid,
         timeStamp: FieldValue.serverTimestamp());
     reference
         .collection('likes')
-        .document(widget.user.uid)
+        .document(widget.currentuser.uid)
         .setData(_like.toMap(_like))
         .then((value) {
       print("Post Liked");
@@ -674,7 +681,7 @@ class _ListItemState extends State<ListItem> {
   void postUnlike(DocumentReference reference) {
     reference
         .collection("likes")
-        .document(widget.user.uid)
+        .document(widget.currentuser.uid)
         .delete()
         .then((value) {
       print("Post Unliked");
