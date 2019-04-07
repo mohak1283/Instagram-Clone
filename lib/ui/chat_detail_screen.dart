@@ -204,7 +204,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
         timestamp: FieldValue.serverTimestamp(),
         type: 'text');
     print(
-        "receiverUid: ${widget.receiverUid} , senderUid : ${_senderuid} , message: ${text}");
+        "receiverUid: ${widget.receiverUid} , senderUid : $_senderuid , message: $text");
     print(
         "timestamp: ${DateTime.now().millisecond}, type: ${text != null ? 'text' : 'image'}");
     _repository.addMessageToDb(_message, widget.receiverUid).then((v) {

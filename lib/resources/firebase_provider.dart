@@ -212,7 +212,7 @@ class FirebaseProvider {
         uid = uidList[i].documentID;
       }
     }
-    print("UID DOC ID: ${uid}");
+    print("UID DOC ID: $uid");
     return uid;
   }
 
@@ -365,7 +365,7 @@ class FirebaseProvider {
     map['timestamp'] = _message.timestamp;
     map['photoUrl'] = _message.photoUrl;
 
-    print("Map : ${map}");
+    print("Map : $map");
     _firestore
         .collection("messages")
         .document(_message.senderUid)

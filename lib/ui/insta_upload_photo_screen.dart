@@ -10,7 +10,7 @@ import 'package:image/image.dart' as Im;
 import 'package:path_provider/path_provider.dart';
 import 'dart:math';
 
-class InstaUploadPhotoScreen extends StatefulWidget {
+class InstaUploadPhotoScreen extends StatefulWidget {  //immutable class again no final to explore ?
    File imageFile;
   InstaUploadPhotoScreen({this.imageFile});
 

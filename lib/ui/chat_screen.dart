@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';         //unused needed or not ?
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/models/user.dart';
 import 'package:instagram_clone/resources/repository.dart';
@@ -11,7 +11,7 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   var _repository = Repository();
-  User _user = User();
+  User user = User();                                           //fix was user instead of _User  
   List<User> usersList = List<User>();
 
   @override

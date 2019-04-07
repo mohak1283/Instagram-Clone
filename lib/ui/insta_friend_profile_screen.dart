@@ -4,7 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:instagram_clone/main.dart';
+import 'package:instagram_clone/main.dart';                            //required ??
 import 'package:instagram_clone/models/like.dart';
 import 'package:instagram_clone/models/user.dart';
 import 'package:instagram_clone/resources/repository.dart';
@@ -39,7 +39,7 @@ class _InstaFriendProfileScreenState extends State<InstaFriendProfileScreen> {
   int followingCount = 0;
 
   fetchUidBySearchedName(String name) async {
-    print("NAME : ${name}");
+    print("NAME : $name");
     String uid = await _repository.fetchUidBySearchedName(name);
     setState(() {
       followingUserId = uid;
@@ -66,7 +66,7 @@ class _InstaFriendProfileScreenState extends State<InstaFriendProfileScreen> {
         });
       });
       _repository.checkIsFollowing(widget.name, user.uid).then((value) {
-        print("VALUE : ${value}");
+        print("VALUE : $value");
         setState(() {
           isFollowing = value;
         });
@@ -426,7 +426,7 @@ class _InstaFriendProfileScreenState extends State<InstaFriendProfileScreen> {
   }
 }
 
-class ListItem extends StatefulWidget {
+class ListItem extends StatefulWidget {            //immutable issue with class ?
   List<DocumentSnapshot> list;
   User user, currentuser;
   int index;
